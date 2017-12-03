@@ -1,0 +1,157 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-view1">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+      
+      .inputContainer{
+        /*width: 100%;*/
+      }
+      
+/*      .leftList >
+      --paper-input-container {
+        align-content: right;
+        text-align: right;
+      }
+  
+      
+          --paper-input-container-shared-input-style_-_text-align: right;
+      
+  */
+      
+
+      .rightList {
+
+      }
+  
+      .middle {
+        width: 25px;
+      }
+
+    </style>
+
+    <div class="card">
+
+  
+
+      <div class="layout horizontal inputContainer">
+        <div class="layout vertical leftList">
+          <template is="dom-repeat" items="{{leftKey}}">
+            <paper-input no-label-float value="{{item}}" read-only>{{item}}</paper-input>
+          </template>
+        </div>
+        <div class="middle"></div>
+        <div class="layout vertical rightList">
+          <template is="dom-repeat" items="{{ rightValue }}">
+            <paper-input id$="{{item.key}}" no-label-float on-focusout="calc" value="{{item.value}}"></paper-input>
+          </template>
+        </div>
+      </div>
+
+    </div>
+
+  </template>
+
+  <script>
+    class MyView1 extends Polymer.Element {
+      static get is() { return 'my-view1'; }
+
+      static get properties(){
+        return {
+
+          leftKey: {
+            type: Array,
+            reflectToAttribute: true,
+            notify: true,
+            value: [
+              "Cost per Hash",
+              "Min. Hash Amt.:",
+              "Maintenance Fee",
+              "USD / Day",
+              "Current Hash Rate",
+              "Days to calculate",
+              "Auto Reinvestment Schedule",
+              "Cash Invested",
+              "Amount Invested",
+            ],
+          },
+          rightValue: {
+            type: Array,
+            reflectToAttribute: true,
+            notify: true,
+            value: [
+              { key: "hashCost", value: ""},
+              { key: "minHash", value: ""},
+              { key: "mainFee", value: ""},
+              { key: "usdDay", value: ""},
+              { key: "currentHash", value: ""},
+              { key: "days", value: ""},
+              { key: "reinvestmentSchedule", value: ""},
+              { key: "cashInvested", value: ""},
+              { key: "investedAmount", value: ""},
+            ]
+          },
+          model: {
+            type: Object,
+            reflectToAttribute: true,
+            notify: true,
+            value: {
+              "hashCost": "",
+              "minHash": "",
+              "mainFee": "",
+              "usdDay": "",
+              "currentHash": "",
+              "days": "",
+              "reinvestmentSchedule": "",
+              "cashInvested": "",
+              "investedAmount": "",
+            }
+          }
+
+        }
+      }
+
+      constructor(){
+        super()
+        console.log("in constructor")
+
+      }
+
+      calc(e){
+        console.log("calc hit", e)
+        console.log("calc hit", e.model.item)
+        var it = e.model.item
+        this.set(`model.${it.key}`, it.value)
+        // console.log("calc hit", e.model.nodeList[0].$.value)
+        console.log("this.model", this.model)
+        console.log("calc hit", this.rightValue)
+        console.log("calc hit", this.leftKey)
+      }
+
+
+      ready(){
+        super.ready()
+        console.log("in ready")
+      }
+
+    }
+
+    window.customElements.define(MyView1.is, MyView1);
+  </script>
+</dom-module>

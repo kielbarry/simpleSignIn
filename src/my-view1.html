@@ -1,12 +1,4 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
+
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
@@ -66,6 +58,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </div>
 
+  <iron-ajax id="ajaxCalc" method="PUT" handle-as="json" content-type="application/json" on-response="responseCalc"></iron-ajax>
+
   </template>
 
   <script>
@@ -96,11 +90,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             reflectToAttribute: true,
             notify: true,
             value: [
-              { key: "hashCost", value: ""},
-              { key: "minHash", value: ""},
-              { key: "mainFee", value: ""},
-              { key: "usdDay", value: ""},
-              { key: "currentHash", value: ""},
+              { key: "hashCost", value: 1.4},
+              { key: "minHash", value: 10},
+              { key: "mainFee", value: .0035},
+              { key: "usdDay", value: 0.01733},
+              { key: "currentHash", value: 4170},
               { key: "days", value: ""},
               { key: "reinvestmentSchedule", value: ""},
               { key: "cashInvested", value: ""},
@@ -131,17 +125,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super()
         console.log("in constructor")
 
+        //placeholder until api handler gets init data
+
+        this.rightValue.map((e, i) => {
+          this.set(`model.${e.key}`, e.value)
+        })
+
       }
 
       calc(e){
-        console.log("calc hit", e)
-        console.log("calc hit", e.model.item)
+
+
         var it = e.model.item
         this.set(`model.${it.key}`, it.value)
-        // console.log("calc hit", e.model.nodeList[0].$.value)
-        console.log("this.model", this.model)
-        console.log("calc hit", this.rightValue)
-        console.log("calc hit", this.leftKey)
+        this.$.ajaxCalc.url = "/calc"
+        this.$.ajaxCalc.body = JSON.stringify(this.model);
+        this.$.ajaxCalc.generateRequest();
+      }
+
+
+      responseCalc(resp){
+        console.log("resp in responsecalc", resp.detail.response)
       }
 
 

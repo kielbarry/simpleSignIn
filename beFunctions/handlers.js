@@ -1,9 +1,7 @@
 const m = require("./models.js")
 
 module.exports = {
-
 	calc: calc,
-
 }
 
 
@@ -45,8 +43,6 @@ function calc(model){
 		// 	// cashInvested += 500;
 		// 	// currentHash += 3650;
 		// }
-
-
 		var newObj = {
 			"investedAmount": investedAmount,
 			"cashInvested": cashInvested,
@@ -61,23 +57,10 @@ function calc(model){
 			"riHashAmount": riHashAmount, 
 		}
 
-
 		answerArray.push(newObj)
-
-
-		// console.log("answerArray INSISE FOR LOOP", answerArray)
-
-
-
 	}
 
-	console.log("answerArray OUTSIDE FOR LOOP", answerArray)
-
 	m.results.answerArray = answerArray
-
-	// console.log("here is m", m)
-	console.log("here is m.results", m.results)
-	// console.log("here is m.answerArray", m.results.answerArray)
 
 	return m;
 }

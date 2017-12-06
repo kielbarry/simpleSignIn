@@ -1,4 +1,5 @@
 
+<script src="https://d3js.org/d3.v4.min.js"></script>
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
@@ -54,10 +55,14 @@
             <paper-input id$="{{item.key}}" no-label-float on-focusout="calc" value="{{item.value}}"></paper-input>
           </template>
         </div>
+        <div class="middle"></div>
+
+        <div class="container" id="chart">
+        asdfadsf asd vsad
+        </div>
+
       </div>
-
     </div>
-
   <iron-ajax id="ajaxCalc" method="PUT" handle-as="json" content-type="application/json" on-response="responseCalc"></iron-ajax>
 
   </template>
@@ -116,7 +121,15 @@
               "cashInvested": "",
               "investedAmount": "",
             }
-          }
+          },
+
+          chartArray: {
+            type: Array,
+            reflectToAttribute: true,
+            notify: true,
+            value: []
+
+          },
 
         }
       }
@@ -140,10 +153,10 @@
         })
       }
 
-      fromServerTypes(resp){
-        console.log("rep", resp)
+      // fromServerTypes(resp){
+        // console.log("rep", resp)
         // this.set("model", resp[0])
-      }
+      // }
 
       calc(e){
 
@@ -161,7 +174,30 @@
       responseCalc(response){
         var resp =  response.detail.response
         console.log("resp in responsecalc", resp)
-        this.fromServerTypes(resp)
+        // this.fromServerTypes(resp)
+
+        this.set("chartArray", resp.results.answerArray)
+
+        this.d3Func()
+      }
+
+
+      d3Func(){
+
+        console.log("this.chartArray in d3func", this.chartArray)
+
+        d3.select("#chart")
+  .selectAll("p")
+  .data([4, 8, 15, 16, 23, 42])
+  .enter().append("p")
+    .text(function(d) { return "I’m number " + d + "!"; })
+    .style("background-color", "black");
+
+        // d3.select("#chart")
+        // .data(this.chartArray)
+        // .enter()
+        // .append("div")
+        // .text(function(d) { return "I’m number " + d + "!"; });
       }
 
 

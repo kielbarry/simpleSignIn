@@ -90,10 +90,10 @@
             reflectToAttribute: true,
             notify: true,
             value: [
-              { key: "hashCost", value: 1.4},
+              { key: "hashCost", value: "$ 1.50"},
               { key: "minHash", value: 10},
-              { key: "mainFee", value: .0035},
-              { key: "usdDay", value: 0.01733},
+              { key: "mainFee", value: "$ 0.0035"},
+              { key: "usdDay", value: "$ 0.021"},
               { key: "currentHash", value: 4170},
               { key: "days", value: ""},
               { key: "reinvestmentSchedule", value: ""},
@@ -126,26 +126,42 @@
         console.log("in constructor")
 
         //placeholder until api handler gets init data
-
         this.rightValue.map((e, i) => {
           this.set(`model.${e.key}`, e.value)
         })
 
       }
 
-      calc(e){
+      toServerTypes(){
+        Object.keys(this.model).map((e, i) => {
+          var newVal = parseFloat(this.model[e].toString().replace(/[^0-9.]/g, ""))
+          newVal ? newVal = newVal : newVal = ""
+          this.set(`model.${e}`,  newVal)
+        })
+      }
 
+      fromServerTypes(resp){
+        console.log("rep", resp)
+        // this.set("model", resp[0])
+      }
+
+      calc(e){
 
         var it = e.model.item
         this.set(`model.${it.key}`, it.value)
+
+        this.toServerTypes()
+
         this.$.ajaxCalc.url = "/calc"
         this.$.ajaxCalc.body = JSON.stringify(this.model);
         this.$.ajaxCalc.generateRequest();
       }
 
 
-      responseCalc(resp){
-        console.log("resp in responsecalc", resp.detail.response)
+      responseCalc(response){
+        var resp =  response.detail.response
+        console.log("resp in responsecalc", resp)
+        this.fromServerTypes(resp)
       }
 
 

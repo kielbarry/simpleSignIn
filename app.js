@@ -30,7 +30,6 @@ http
 
 app.put("/calc", (req, res) => {
 	if (!req.body) return res.sendStatus(400)
-	console.log("req.body", req.body)
-	f.calc(req.body)
-	res.send({"response":"here is data"})
+	var results = f.calc(req.body)
+	res.send(results)
 })

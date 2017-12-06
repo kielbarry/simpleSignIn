@@ -11,7 +11,8 @@ let hashflareUserInput = {
 }
 
 module.exports = {
-
 	hfui: hashflareUserInput,
-
+	results: {
+		answerArray: [],
+	}
 }

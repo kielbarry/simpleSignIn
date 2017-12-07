@@ -12,27 +12,27 @@
 
         padding: 10px;
       }
-      
+
       .inputContainer{
         /*width: 100%;*/
       }
-      
+
 /*      .leftList >
       --paper-input-container {
         align-content: right;
         text-align: right;
       }
-  
-      
+
+
           --paper-input-container-shared-input-style_-_text-align: right;
-      
+
   */
-      
+
 
       .rightList {
 
       }
-  
+
       .middle {
         width: 25px;
       }
@@ -41,7 +41,7 @@
 
     <div class="card">
 
-  
+
 
       <div class="layout horizontal inputContainer">
         <div class="layout vertical leftList">
@@ -57,8 +57,7 @@
         </div>
         <div class="middle"></div>
 
-        <div class="container" id="chart">
-        asdfadsf asd vsad
+        <div class="container layout horizontal" id="chart">
         </div>
 
       </div>
@@ -186,18 +185,33 @@
 
         console.log("this.chartArray in d3func", this.chartArray)
 
-        d3.select("#chart")
-  .selectAll("p")
-  .data([4, 8, 15, 16, 23, 42])
-  .enter().append("p")
-    .text(function(d) { return "I’m number " + d + "!"; })
-    .style("background-color", "black");
+        // var heightArr = Math.max(... this.chartArray.map(e => {
+        //   return e.currentHash
+        // }))
+        var heightArr = this.chartArray.map(e => {
+          return e.currentHash
+        })
 
-        // d3.select("#chart")
-        // .data(this.chartArray)
-        // .enter()
-        // .append("div")
-        // .text(function(d) { return "I’m number " + d + "!"; });
+        var maxHeight = Math.max(... heightArr)
+        // var maxHeight = Math.max(... this.chartArray.currentHash)
+
+        console.log("heightArr", heightArr)
+        console.log("maxHeight", maxHeight)
+
+        d3.select(this.$.chart)
+        .selectAll("div")
+        .data(this.chartArray)
+        .enter().append("div")
+        .text(function(d) { return "I’m number " + d.currentHash + "!"; })
+        .style("height", function(d) { return d / 100 + "px"; })
+        .style("background-color", "green")
+        // .style("margin-left", 20 / this.chartArray.length + "px")
+        .style("margin-left", 20 + "px")
+        .style("width", (d) => (1 / this.chartArray.length) * 100 * .5 + "%")
+        .style("height", 20 / this.chartArray.length + "px")
+
+
+
       }
 
 

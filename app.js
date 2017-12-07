@@ -1,6 +1,6 @@
 require("dotenv").config()
 
-const 
+const
 express = require("express"),
 app = express(),
 router = express.Router()
@@ -12,7 +12,34 @@ bodyParser = require("body-parser"),
 request = require("request"),
 URL = require("url-parser"),
 db = require("./config/db"),
-f = require("./beFunctions/handlers.js")
+f = require("./beFunctions/handlers.js"),
+coinbase = require('coinbase'),
+mycbkey = process.env.cbAPIK,
+mycbsecret = process.env.cbAPIS,
+client = new coinbase.Client({'apiKey': mycbkey, 'apiSecret': mycbsecret}),
+mypolkey = process.env.polAPIK,
+mypolsecret = process.env.polAPIS
+
+
+console.log("mypolkey, my polsecret", mypolkey, mypolsecret)
+
+const Poloniex = require('poloniex-api-node');
+let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
+
+poloniex.returnAvailableAccountBalances().then((balances) => {
+  console.log(balances);
+}).catch((err) => console.log(err.message));
+
+
+// console.log("mykey, mysecret", mykey, mysecret)
+//
+// client.getAccounts({}, function(err, accounts) {
+// 	console.log("acc", accounts)
+//   accounts.forEach(function(acct) {
+// 		console.log('my bal: ' + acct.balance.amount + ' for ' + acct.name);
+// 		console.log('my bal: ' + acct.native_balance.amount + ' for ' + acct.native_balance.currency);
+//   });
+// });
 
 app
 	.use(morgan("dev"))

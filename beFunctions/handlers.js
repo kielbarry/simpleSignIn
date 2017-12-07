@@ -1,12 +1,19 @@
-const m = require("./models.js")
+require("dotenv").config()
+
+const m = require("./models.js"),
+mypolkey = process.env.polAPIK,
+mypolsecret = process.env.polAPIS,
+Poloniex = require('poloniex-api-node'),
+poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 })
+
 
 module.exports = {
 	calc: calc,
+	getPO: getPO,
 }
 
-
 function calc(model){
-	
+
 	m.hfui = model
 	var riAmountArray =[];
 	var wallet = 0;
@@ -54,7 +61,7 @@ function calc(model){
 			"earnings": earnings,
 			"daysToRecoup": investedAmount / profit,
 			"equivAnnualEarnings" : profit * 365,
-			"riHashAmount": riHashAmount, 
+			"riHashAmount": riHashAmount,
 		}
 
 		answerArray.push(newObj)
@@ -63,4 +70,10 @@ function calc(model){
 	m.results.answerArray = answerArray
 
 	return m;
+}
+
+function getPO(){
+	poloniex.returnAvailableAccountBalances().then((balances) => {
+	  console.log(balances);
+	}).catch((err) => console.log(err.message));
 }

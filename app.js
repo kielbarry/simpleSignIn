@@ -17,20 +17,21 @@ coinbase = require('coinbase'),
 mycbkey = process.env.cbAPIK,
 mycbsecret = process.env.cbAPIS,
 coinbase = new coinbase.Client({'apiKey': mycbkey, 'apiSecret': mycbsecret})
-// mypolkey = process.env.polAPIK,
-// mypolsecret = process.env.polAPIS
+mypolkey = process.env.polAPIK,
+mypolsecret = process.env.polAPIS
 
 
 
-// const Poloniex = require('poloniex-api-node');
-// let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
+const Poloniex = require('poloniex-api-node');
+let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
 
-// poloniex.returnAvailableAccountBalances().then((balances) => {
-//   console.log(balances);
-// }).catch((err) => console.log(err.message));
+poloniex.returnAvailableAccountBalances().then((balances) => {
+  console.log(balances);
+}).catch((err) => console.log(err.message));
 
-
-
+poloniex.returnCompleteBalances().then((balances) => {
+  console.log(balances);
+}).catch((err) => console.log(err.message));
 // coinbase.getAccounts({}, function(err, accounts) {
 // 	console.log("acc", accounts)
 //  	 accounts.forEach(function(acct) {
@@ -60,6 +61,8 @@ app.put("/calc", (req, res) => {
 })
 
 app.get("/allaccountvalues", (req, res) => {
+
+	console.log("hit")
 
 	var results = f.getAllAccountValues()
 

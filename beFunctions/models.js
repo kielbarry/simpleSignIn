@@ -21,6 +21,6 @@ module.exports = {
 	hfui: hashflareUserInput,
 	results: {
 		answerArray: [],
-	}
+	},
 	po: poloniexObjects,
 }

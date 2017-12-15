@@ -1,10 +1,10 @@
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
 
-<dom-module id="my-view1">
+<dom-module id="hashflare-calculator">
   <template>
     <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
@@ -62,13 +62,14 @@
 
       </div>
     </div>
+    
   <iron-ajax id="ajaxCalc" method="PUT" handle-as="json" content-type="application/json" on-response="responseCalc"></iron-ajax>
 
   </template>
 
   <script>
-    class MyView1 extends Polymer.Element {
-      static get is() { return 'my-view1'; }
+    class HashflareCalculator extends Polymer.Element {
+      static get is() { return 'hashflare-calculator'; }
 
       static get properties(){
         return {
@@ -222,6 +223,6 @@
 
     }
 
-    window.customElements.define(MyView1.is, MyView1);
+    window.customElements.define(HashflareCalculator.is, HashflareCalculator);
   </script>
 </dom-module>

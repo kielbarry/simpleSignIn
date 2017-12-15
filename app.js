@@ -16,28 +16,28 @@ f = require("./beFunctions/handlers.js"),
 coinbase = require('coinbase'),
 mycbkey = process.env.cbAPIK,
 mycbsecret = process.env.cbAPIS,
-coinbase = new coinbase.Client({'apiKey': mycbkey, 'apiSecret': mycbsecret}),
-mypolkey = process.env.polAPIK,
-mypolsecret = process.env.polAPIS
+coinbase = new coinbase.Client({'apiKey': mycbkey, 'apiSecret': mycbsecret})
+// mypolkey = process.env.polAPIK,
+// mypolsecret = process.env.polAPIS
 
 
 
-const Poloniex = require('poloniex-api-node');
-let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
+// const Poloniex = require('poloniex-api-node');
+// let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
 
-poloniex.returnAvailableAccountBalances().then((balances) => {
-  console.log(balances);
-}).catch((err) => console.log(err.message));
+// poloniex.returnAvailableAccountBalances().then((balances) => {
+//   console.log(balances);
+// }).catch((err) => console.log(err.message));
 
 
 
-coinbase.getAccounts({}, function(err, accounts) {
-	console.log("acc", accounts)
- 	 accounts.forEach(function(acct) {
-		console.log('my bal: ' + acct.balance.amount + ' for ' + acct.name);
-		console.log('my bal: ' + acct.native_balance.amount + ' for ' + acct.native_balance.currency);
-  });
-});
+// coinbase.getAccounts({}, function(err, accounts) {
+// 	console.log("acc", accounts)
+//  	 accounts.forEach(function(acct) {
+// 		console.log('my bal: ' + acct.balance.amount + ' for ' + acct.name);
+// 		console.log('my bal: ' + acct.native_balance.amount + ' for ' + acct.native_balance.currency);
+//   });
+// });
 
 app
 	.use(morgan("dev"))
@@ -58,3 +58,14 @@ app.put("/calc", (req, res) => {
 	var results = f.calc(req.body)
 	res.send(results)
 })
+
+app.get("/allaccountvalues", (req, res) => {
+
+	var results = f.getAllAccountValues()
+
+	console.log("results", results)
+
+	res.send(results)
+})
+
+

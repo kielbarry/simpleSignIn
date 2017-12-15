@@ -2,14 +2,15 @@ require("dotenv").config()
 
 const m = require("./models.js"),
 mypolkey = process.env.polAPIK,
-mypolsecret = process.env.polAPIS,
-Poloniex = require('poloniex-api-node'),
-poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 })
+mypolsecret = process.env.polAPIS
+const Poloniex = require('poloniex-api-node');
+let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
 
 
 module.exports = {
 	calc: calc,
 	getPO: getPO,
+	getAllAccountValues: getAllAccountValues,
 }
 
 function calc(model){
@@ -75,5 +76,13 @@ function calc(model){
 function getPO(){
 	poloniex.returnAvailableAccountBalances().then((balances) => {
 	  console.log(balances);
+	}).catch((err) => console.log(err.message));
+}
+
+
+function getAllAccountValues(){
+	poloniex.returnAvailableAccountBalances().then((balances) => {
+	  console.log(balances);
+	  return balances
 	}).catch((err) => console.log(err.message));
 }

@@ -10,7 +10,7 @@ let hashflareUserInput = {
   	investedAmount: ''
 }
 
-let poloniexObjects = {
+let poloniexObject = {
 	coinname: '',
 	coinamount: '',
 	coinvalue:'',
@@ -22,5 +22,7 @@ module.exports = {
 	results: {
 		answerArray: [],
 	},
-	po: poloniexObjects,
+	poloniexObject: poloniexObject,
 }
+
+

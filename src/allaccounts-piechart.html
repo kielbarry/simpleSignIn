@@ -11,13 +11,17 @@
 
         padding: 10px;
       }
+
+      .toolTip {
+
     </style>
 
     <div class="card">
-      <div class="circle">2</div>
-      <h1>View Two</h1>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>
-      <p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>
+
+      <div id="piechart">
+
+      </div>
+
     </div>
 
 
@@ -46,8 +50,52 @@
         this.$.ajaxAllAccountValues.generateRequest();
       }
 
+
+
       populatePieChart(response){
-        console.log("response in populatePieChart", response)
+
+        var res = response.detail.response
+
+        var totalValue = Number(res.reduce((a,b) => a + b.usdbalance, 0.00).toFixed(2), -2)
+
+        res = res.sort((a,b) => a.usdbalance > b.usdbalance)
+
+        var len = res.length
+
+        var width = 360;
+        var height = 360;
+        var radius = Math.min(width, height) / 2;
+
+        var svg = d3.select(this.$.piechart)
+          .append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', 'translate(' + (width / 2) +
+            ',' + (height / 2) + ')');
+
+        var pie = d3.pie()
+          .value(d => d.usdbalance / totalValue)
+          .sort(null)
+
+        var path = svg.selectAll('path')
+          .data(pie(res))
+          .enter()
+          .append('path')
+          .attr('d', d3.arc()
+            .innerRadius(45)
+            .outerRadius(radius))
+          .attr('fill', (d,i) => {
+              // var inc = Math.floor(d.data.usdbalance * 255 / totalValue)
+              // console.log(inc)
+              // if(i!=0){
+              //   var r = 255 - inc
+              //   var g = 128 
+              //   var b = 0 + inc
+              // }
+            // return "rgb(" + r + ", "+ g + ", " + b + ")"
+            return '#'+Math.floor(Math.random()*16777215).toString(16) 
+          });
       }
 
       ready(){
@@ -61,3 +109,24 @@
     window.customElements.define(AllAccountsPieChart.is, AllAccountsPieChart);
   </script>
 </dom-module>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

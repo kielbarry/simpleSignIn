@@ -78,13 +78,13 @@ function calc(model){
 }
 
 function getPO(){
-	let po = {
-		coinname: '',
-		coinamount: '',
-		coinvalue:'',
-		usdbalance: '',
-		exchange: '',
-	}
+	// let po = {
+	// 	coinname: '',
+	// 	coinamount: '',
+	// 	coinvalue:'',
+	// 	usdbalance: '',
+	// 	exchange: '',
+	// }
 
 	var btcPrice;
 	var arr = []
@@ -95,6 +95,13 @@ function getPO(){
 	}).catch(err => console.log(err.message))
 
 	poloniex.returnCompleteBalances().then((balances) => {
+		let po = {
+		coinname: '',
+		coinamount: '',
+		coinvalue:'',
+		usdbalance: '',
+		exchange: '',
+	}
 		Object.keys(balances).map(key => {
 		  	if(balances[key].available > 0){
 		  		po.coinname = key;
@@ -149,42 +156,36 @@ function getCB(){
 
 function getAllAccountValues(req, res){
 
-	var cbarr = getCB()
-	var polarr = getPO()
+	var btcPrice;
+	var arr = []
 
-	// console.log(cbarr)
-	// console.log(polarr)
+	poloniex.returnTicker()
+	.then(balances => {
+		btcPrice = balances.USDT_BTC.lowestAsk
+	}).catch(err => console.log(err.message))
 
+	poloniex.returnCompleteBalances().then((balances) => {
+		Object.keys(balances).map(key => {
+			let po = {
+				coinname: '',
+				coinamount: '',
+				coinvalue:'',
+				usdbalance: '',
+				exchange: '',
+			}
+		  	if(balances[key].available > 0){
+		  		po.coinname = key;
+		  		po.coinamount = parseFloat(balances[key].available);
+		  		po.coinvalue = parseFloat(balances[key].btcValue);
+		  		po.exchange = "Poloniex";
+		  		po.usdbalance = Number((parseFloat(balances[key].btcValue) * parseFloat(btcPrice)).toFixed(2));
+		  		arr.push(po)
+		  	}
+		})
+		console.log("arr", arr)
+		// return arr
+	}).catch((err) => console.log(err.message))
+	.then(e => res.send(arr))
 
-	// let po = {
-	// 	coinname: '',
-	// 	coinamount: '',
-	// 	coinvalue:'',
-	// 	usdbalance: '',
-	// 	exchange: '',
-	// }
-
-	// var btcPrice;
-	// var arr = []
-
-	// poloniex.returnTicker()
-	// .then(balances => {
-	// 	btcPrice = balances.USDT_BTC.lowestAsk
-	// }).catch(err => console.log(err.message))
-
-	// poloniex.returnCompleteBalances().then((balances) => {
-	// 	Object.keys(balances).map(key => {
-	// 	  	if(balances[key].available > 0){
-	// 	  		po.coinname = key;
-	// 	  		po.coinamount = parseFloat(balances[key].available);
-	// 	  		po.coinvalue = balances[key].btcValue;
-	// 	  		po.exchange = "Poloniex";
-	// 	  		po.usdbalance = (parseFloat(balances[key].btcValue) * parseFloat(btcPrice)).toFixed(2);
-	// 	  		arr.push(po)
-	// 	  	}
-	// 	})
-	// 	console.log("arr being sent", arr)
-	// }).catch((err) => console.log(err.message))
-	// .then(e => res.send(arr))
 
 }

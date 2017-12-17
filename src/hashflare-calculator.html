@@ -194,25 +194,27 @@
         })
 
         var maxHeight = Math.max(... heightArr)
-        // var maxHeight = Math.max(... this.chartArray.currentHash)
+        var maxPixelHeight = 378
+        var len = this.chartArray.length
+        var maxPixelWidth = 1264
 
-        console.log("heightArr", heightArr)
-        console.log("maxHeight", maxHeight)
 
         d3.select(this.$.chart)
         .selectAll("div")
+        .data([])
         .data(this.chartArray)
         .enter().append("div")
-        .text(function(d) { return "I’m number " + d.currentHash + "!"; })
-        .style("height", function(d) { return d / 100 + "px"; })
+        .style("height", (d) => {
+          return Math.round((d.currentHash / maxHeight) * maxPixelHeight)   + "px"
+        })
+        .style("margin-top", (d) => {
+          return maxPixelHeight - Math.round((d.currentHash / maxHeight) * maxPixelHeight)   + "px"
+        })
         .style("background-color", "green")
-        // .style("margin-left", 20 / this.chartArray.length + "px")
-        .style("margin-left", 20 + "px")
-        .style("width", (d) => (1 / this.chartArray.length) * 100 * .5 + "%")
-        .style("height", 20 / this.chartArray.length + "px")
-
-
-
+        .style("width", (d) => {
+          return (Math.floor(maxPixelWidth / len).toString()) - 1 + "px"
+        })
+        .style("margin-left", "1px")
       }
 
 

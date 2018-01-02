@@ -1,0 +1,220 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="sign-up">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+      .wrapper-btns {
+        margin-top: 15px;
+      }
+      paper-button {
+          background-color: #4285f4;
+          color: white;
+      }
+      #signUpButton {
+        opacity: var(--button-opacity);
+      }
+
+      #passwordMatchWarning,
+      #blanksPresent,
+      #invalidWarning {
+        padding-left: 15px;
+        color: red;
+      }
+
+    </style>
+
+    <div class="card">
+      <div id="unauthenticated">
+          <h1>Log In</h1>
+
+          <p><strong>Log in</strong> or <strong>sign up</strong></p>
+
+          
+          <label>First Name *</label>
+          <paper-input is="iron-input" id="firstname" type="text" no-label-float value="{{formData.firstname}}" on-focusout="allFieldsInput"></paper-input>
+
+          <label>Last Name *</label>
+          <paper-input is="iron-input" id="lastname" type="text" no-label-float value="{{formData.lastname}}" on-focusout="allFieldsInput"></paper-input>
+
+          <label>Email *</label>
+          <paper-input is="iron-input" id="email" type="email" no-label-float value="{{formData.email}}" on-focusout="allFieldsInput"></paper-input>
+
+
+
+          <div class="layout horizontal">
+              <label>Password *</label>
+              <div id="invalidWarning" style="display: {{ conditionalCSS.invalidwarning }}">
+                Passwords must contain a number, uppercase and lowercase letter, a special char, and  be at least 8 chars long.
+              </div>
+          </div>
+          <paper-input is="iron-input" id="password" type="password" no-label-float value="{{formData.password}}" on-focusout="allFieldsInput" on-keyup="validatePassword"></paper-input>
+
+
+
+          <div class="layout horizontal">
+              <label>Repeat Password *</label>
+              <div id="passwordMatchWarning" style="display: {{ conditionalCSS.matchwarning }}">
+                Please ensure your passwords match
+              </div>
+          </div>
+          <paper-input is="iron-input" id="repeatpassword" type="password" no-label-float value="{{formData.repeatpassword}}" on-keyup="doPasswordsMatch" on-focusout="allFieldsInput"></paper-input>
+
+
+
+          <div id="blanksPresent" style="display: {{ conditionalCSS.blankswarning }}">Please fill in all fields to continue</div>
+
+          <div class="wrapper-btns">
+              <paper-button id="signUpButton" raised class="link" disabled="[[conditionalCSS.disabledbutton]]"
+              on-tap="signUp">Sign Up</paper-button>
+              <label> Already a user? </label>
+              <paper-button raised class="primary">Log In</paper-button>
+          </div>
+
+      </div>    
+  </div>
+  
+  <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
+
+
+  </template>
+
+  <script>
+    class SignUp extends Polymer.Element {
+      
+      static get is() { 
+        return 'sign-up'; 
+      }
+
+      static get properties() {
+        return {
+          formData: {
+            type: Object,
+            value : {
+              'firstname': '',
+              'lastname': '',
+              'email': '',
+              'password': '',
+              'repeatpassword': '',
+            },
+          },
+          conditionalCSS: {
+            type: Object,
+            value: {
+              'matchwarning': 'none',
+              'blankswarning' : 'none',
+              'invalidwarning': 'none',
+              'disabledbutton' : true,
+            },
+          },
+          validForm: {
+            type: Object,
+            value: {
+              'passwordvalid': false,
+              'passwordsmatch': false,
+              'allfields' : false,
+            },
+            reflectToAttribute: true,
+            notify: true,
+          },
+        }
+      }
+
+      static get observers(){
+        return [
+        'validateForm(validForm.*)'
+        ]
+      }
+
+      constructor(){
+        super()
+      }
+
+      allFieldsInput(){
+
+        var blanks = false;
+        Object.keys(this.formData).map(key => {
+          if(this.formData[key] === ''){
+            blanks = true
+            return
+          }
+        })
+
+        blanks ? 
+          this.set('conditionalCSS.blankswarning', 'block') : 
+          this.set('conditionalCSS.blankswarning', 'none')
+
+        blanks ? 
+           this.set('validForm.allfields', false) : 
+           this.set('validForm.allfields', true)
+      }
+
+      doPasswordsMatch() {
+        var pw = this.formData.password
+        var rpw = this.formData.repeatpassword
+        pw !== rpw ? 
+          this.set('conditionalCSS.matchwarning', 'block') :
+          this.set('conditionalCSS.matchwarning', 'none')
+
+        pw !== rpw ? 
+          this.set('validForm.passwordsmatch', false) :
+          this.set('validForm.passwordsmatch', true)
+
+      }
+
+
+      validatePassword(){
+        var valid = this.formData.password.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}/)
+        valid === null ? 
+          this.set('conditionalCSS.invalidwarning', 'block') : 
+          this.set('conditionalCSS.invalidwarning', 'none')
+
+        valid === null ? 
+          this.set('validForm.passwordvalid', false) : 
+          this.set('validForm.passwordvalid', true)
+
+      }
+
+      validateForm(validForm){
+
+        var valid = true
+        Object.keys(this.validForm).some(key => {
+          if(this.validForm[key] === false) {
+            this.set('conditionalCSS.disabledbutton', true)
+            this.updateStyles({
+              '--button-opacity': 0.5,
+            })
+            valid = false
+          }
+        })
+
+        if(valid){
+          this.set('conditionalCSS.disabledbutton', false) 
+          this.updateStyles({
+            '--button-opacity': 1,
+          })
+        }
+      }
+
+      signUp(){
+        this.$.ajaxSignUp.url = "/signup"
+        this.$.ajaxSignUp.body = JSON.stringify(this.formData);
+        this.$.ajaxSignUp.generateRequest();
+      }
+
+
+      ready(){
+        super.ready()
+      }
+
+
+    }
+
+    window.customElements.define(SignUp.is, SignUp);
+  </script>
+</dom-module>

@@ -11,34 +11,23 @@ morgan = require("morgan"),
 bodyParser = require("body-parser"),
 request = require("request"),
 URL = require("url-parser"),
-db = require("./config/db"),
-f = require("./beFunctions/handlers.js")
-// coinbase = require('coinbase'),
-// mycbkey = process.env.cbAPIK,
-// mycbsecret = process.env.cbAPIS,
-// coinbase = new coinbase.Client({'apiKey': mycbkey, 'apiSecret': mycbsecret})
-// mypolkey = process.env.polAPIK,
-// mypolsecret = process.env.polAPIS
+// db = require("./config/db"),
+init = require("./database/init.js"),
+f = require("./beFunctions/handlers.js"),
+bcrypt = require("bcrypt"),
+{ Client } = require('pg')
+client = new Client();
 
 
+init.initQuery();
 
-// const Poloniex = require('poloniex-api-node');
-// let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
+// client.connect()
 
-// poloniex.returnAvailableAccountBalances().then((balances) => {
-//   console.log(balances);
-// }).catch((err) => console.log(err.message));
+// client.query('SELECT * FROM users', [], (err, res) => {
+//   console.log(err ? err.stack : res.rows[0].message) // Hello World!
+//   client.end()
+// })
 
-// poloniex.returnCompleteBalances().then((balances) => {
-//   console.log(balances);
-// }).catch((err) => console.log(err.message));
-// coinbase.getAccounts({}, function(err, accounts) {
-// 	console.log("acc", accounts)
-//  	 accounts.forEach(function(acct) {
-// 		console.log('my bal: ' + acct.balance.amount + ' for ' + acct.name);
-// 		console.log('my bal: ' + acct.native_balance.amount + ' for ' + acct.native_balance.currency);
-//   });
-// });
 
 app
 	.use(morgan("dev"))
@@ -63,5 +52,65 @@ app.put("/calc", (req, res) => {
 app.get("/allaccountvalues", (req, res) => {
 	f.getAllAccountValues(req, res)
 })
+
+// app.post("/signup", (req, res) => {
+// 	if (!req.body) return res.sendStatus(400)
+// 	console.log('hit api', req.body)
+// 	bcrypt.hash(myPlaintextPassword, 10, function(err, hash) {
+// 	  // Store hash in your password DB.
+// 	});
+// })
+
+app.post('/signup', (req, res, next) => {
+
+  const results = [];
+  const data = req.body
+  console.log('data', data)
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    client.query(`INSERT INTO users VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, [
+    	id,
+    	versionid,
+		createdat,
+		data.firstname,
+		data.lastname,
+		data.email,
+		passwordHash,
+		activationCode,
+		false,
+		false
+	]);
+
+
+
+    // SQL Query > Select Data
+    const query = client.query('SELECT * FROM users ORDER BY id ASC');
+    // Stream results back one row at a time
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    // After all data is returned, close connection and return results
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+
+
+
+
+
+
+
+
 
 

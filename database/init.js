@@ -17,28 +17,34 @@ console.log()
 function initQuery() {
 	console.log('in initQuery')
 
-	client.connect();
-	// const query = client.query(
-	//   `CREATE TABLE IF NOT EXISTS users(
-	// 	id INT SERIAL PRIMARY KEY,
-	// 	versionid STRING,
-	// 	createdat DATE,
-	// 	firstname STRING,
-	// 	lastname STRING,
-	// 	email STRING NOT NULL UNIQUE,
-	// 	passwordHash STRING NOT NULL,
-	// 	activationCode STRING NOT NULL VARCHAR(60),
-	// 	emailVerified BOOL,
-	// 	phoneVerified BOOL,
-	// 	UNIQUE_CONSTRAINT (id, versionid)
-	// );
+	var str = `CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY,
+		versionid varchar(64),
+		createdat DATE,
+		firstname varchar(64),
+		lastname varchar(64),
+		email varchar(64) NOT NULL UNIQUE,
+		passwordHash varchar(64) NOT NULL,
+		activationCode varchar(64) NOT NULL,
+		emailVerified BOOLEAN,
+		phoneVerified BOOLEAN
+	);
+`
 	// CREATE INDEX CONCURRENTLY IF NOT EXISTS email_idx on (lower(email));
 	// CREATE INDEX CONCURRENTLY IF NOT EXISTS full_name_idx on (CONCAT(lower(firstname), ' ', lower(lastname)));
-	// `);
-	const query = client.query(`\list`);
+
+	// await client.connect();
+	// var res = await client.query(str);
+	// res.rows.forEach(row=>{
+	//     console.log(row);
+	// });
+	// await client.end();
+
+
+	client.connect();
+	var query = client.query(str).then(res => console.log(res))
+
 	console.log(query)
-
-
 
 	// query.on('end', () => { client.end(); });
 }

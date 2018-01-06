@@ -32,5 +32,13 @@
   "version": "1.0.0",
   "main": "app.js",
   "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kielbarry/simpleSignIn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kielbarry/simpleSignIn/issues"
+  },
+  "homepage": "https://github.com/kielbarry/simpleSignIn#readme",
   "description": ""
 }

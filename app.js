@@ -15,11 +15,17 @@ URL = require("url-parser"),
 init = require("./database/init.js"),
 f = require("./beFunctions/handlers.js"),
 bcrypt = require("bcrypt"),
-{ Client } = require('pg')
-client = new Client();
+pg = require('pg'),
+{ Client } = require('pg'),
+username = process.env.PGUSER,
+password = process.env.PGPASSWORD,
+host = process.env.PGHOST,
+database = process.env.PGDATABASE,
+port = process.env.PGPORT,
+connectionString = process.env.DATABASE_URL || `postgres://${username}:${password}@${host}:${port}/${database}`,
+client = new pg.Client(connectionString);{}
 
-
-init.initQuery();
+// init.initQuery();
 
 // client.connect()
 
@@ -63,45 +69,63 @@ app.get("/allaccountvalues", (req, res) => {
 
 app.post('/signup', (req, res, next) => {
 
+  if (!req.body) return res.sendStatus(400)
+
   const results = [];
   const data = req.body
-  console.log('data', data)
 
-  pg.connect(connectionString, (err, client, done) => {
+  const myPlaintextPassword = req.body.password;
 
-    if(err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
+  bcrypt.hash(req.body.password, 10, function(err, hash) {
+    
+    const client = new Client({
+      connectionString: connectionString,
+    })
+    client.connect()
 
-    client.query(`INSERT INTO users VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, [
-    	id,
-    	versionid,
-		createdat,
-		data.firstname,
-		data.lastname,
-		data.email,
-		passwordHash,
-		activationCode,
-		false,
-		false
-	]);
+    client.query('SELECT MAX(id) FROM users', (err, res) => {
+      console.log("here is res", res)
+      if(err) res.send({ success: false, error: err })
+
+    })
+
+    // client.query(`SELECT MAX(id) FROM users);`, (err, res) => {
+
+    //   console.log(err, res)
+    // })
 
 
+  })
 
-    // SQL Query > Select Data
-    const query = client.query('SELECT * FROM users ORDER BY id ASC');
-    // Stream results back one row at a time
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    // After all data is returned, close connection and return results
-    query.on('end', () => {
-      done();
-      return res.json(results);
-    });
-  });
+  //   client.query(`INSERT INTO users VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, [
+  //   	id,
+  //   	versionid,
+  // 		time.Now(),
+  // 		data.firstname,
+  // 		data.lastname,
+  // 		data.email,
+  // 		passwordHash,
+  // 		activationCode,
+  // 		false,
+  // 		false
+  // 	]);
+
+
+
+  //   // SQL Query > Select Data
+  //   const query = client.query('SELECT * FROM users ORDER BY id ASC');
+  //   // Stream results back one row at a time
+  //   query.on('row', (row) => {
+  //     results.push(row);
+  //   });
+  //   // After all data is returned, close connection and return results
+  //   query.on('end', () => {
+  //     done();
+  //     return res.json(results);
+  //   });
+  // });
+
+
 });
 
 

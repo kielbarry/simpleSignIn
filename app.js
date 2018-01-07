@@ -15,6 +15,8 @@ URL = require("url-parser"),
 init = require("./database/init.js"),
 f = require("./beFunctions/handlers.js"),
 bcrypt = require("bcrypt"),
+rcsk = process.env.recaptchaSecret,
+nodemailer = require('nodemailer'),
 pg = require('pg'),
 { Client } = require('pg'),
 username = process.env.PGUSER,
@@ -69,7 +71,24 @@ app.get("/allaccountvalues", (req, res) => {
 
 app.post('/signup', (req, res, next) => {
 
+
   if (!req.body) return res.sendStatus(400)
+
+  if([undefined, '', null].includes(req.body['g-recaptcha-response'])) {
+      return res.json({"responseCode" : 1,"responseDesc" : "Please select captcha"});
+  }
+
+
+  var verificationUrl = "https://www.google.com/recaptcha/api/siteverify?secret=" + rcsk + "&response=" + req.body['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
+
+
+  request(verificationUrl, function(error, response, body) {
+    body = JSON.parse(body);
+    if(body.success !== undefined && !body.success) {
+      return res.json({"responseCode" : 1, "responseDesc" : body["error-codes"]});
+    }
+  });
+
 
   const results = [];
   const data = req.body
@@ -88,14 +107,36 @@ app.post('/signup', (req, res, next) => {
       if(err) res.send({ success: false, error: err })
 
     })
-
-    // client.query(`SELECT MAX(id) FROM users);`, (err, res) => {
-
-    //   console.log(err, res)
-    // })
-
-
   })
+
+
+nodemailer.createTestAccount((err, account) => {
+
+    var smtpTransport = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        auth: {
+            user: process.env.USEREMAIL,
+            pass: process.env.USERPASSWORD
+        }
+    });
+
+    let mailOptions = {
+        from: process.env.USEREMAIL,
+        to: req.body.email,
+        subject: `Welcome to Telemis, ${req.body.firstname}`, // Subject line
+        text: 'Hello world?', // plain text body
+        html: '<b>Hello world?</b>' // html body
+    };
+
+    smtpTransport.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+    });
+});
+
+
 
   //   client.query(`INSERT INTO users VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, [
   //   	id,

@@ -12,11 +12,19 @@ bodyParser = require("body-parser"),
 request = require("request"),
 URL = require("url-parser"),
 // db = require("./config/db"),
+model = require("./database/models.js"),
 init = require("./database/init.js"),
 f = require("./beFunctions/handlers.js"),
 bcrypt = require("bcrypt"),
 rcsk = process.env.recaptchaSecret,
 nodemailer = require('nodemailer'),
+redis = require("redis"),
+redisClient = redis.reateClient(),
+Nexmo = require('nexmo');
+nexmo = new Nexmo({
+  apiKey: process.env.NEXMOKEY,
+  apiSecret: process.env.NEXMOSECRET
+}),
 pg = require('pg'),
 { Client } = require('pg'),
 username = process.env.PGUSER,
@@ -51,6 +59,9 @@ http
 	.on("listening", () => console.log("serving port: ", PORT))
 
 
+
+
+
 app.put("/calc", (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	var results = f.calc(req.body)
@@ -69,6 +80,15 @@ app.get("/allaccountvalues", (req, res) => {
 // 	});
 // })
 
+app.post('/sendsms', (req, res, next) => {
+    nexmo.verify.request({number: req.body.number, code_length: 6}, (err, result) => {
+    if(err) return res.sendStatus(500);
+    if(result.status !== '0') return res.status(401).send(result.error_text)
+    res.render('verify', {requestId: result.request_id})
+  });
+});
+
+
 app.post('/signup', (req, res, next) => {
 
 
@@ -78,9 +98,7 @@ app.post('/signup', (req, res, next) => {
       return res.json({"responseCode" : 1,"responseDesc" : "Please select captcha"});
   }
 
-
   var verificationUrl = "https://www.google.com/recaptcha/api/siteverify?secret=" + rcsk + "&response=" + req.body['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
-
 
   request(verificationUrl, function(error, response, body) {
     body = JSON.parse(body);
@@ -88,6 +106,20 @@ app.post('/signup', (req, res, next) => {
       return res.json({"responseCode" : 1, "responseDesc" : body["error-codes"]});
     }
   });
+
+
+
+/*
+redis stuff
+*/
+
+redisClient.on('connect', (err, res) => err ? console.log(err) : console.log('redis connected'))
+
+
+/*
+redis stuff
+*/
+
 
 
   const results = [];
@@ -134,6 +166,7 @@ nodemailer.createTestAccount((err, account) => {
             return console.log(error);
         }
     });
+
 });
 
 

@@ -68,10 +68,17 @@
               </div>
           </div>
           <paper-input is="iron-input" id="repeatpassword" type="password" no-label-float value="{{formData.repeatpassword}}" on-keyup="doPasswordsMatch" on-focusout="allFieldsInput"></paper-input>
-
-
-
           <div id="blanksPresent" style="display: {{ conditionalCSS.blankswarning }}">Please fill in all fields to continue</div>
+
+
+          <label>Phone Number *</label>
+          <paper-input is="iron-input" id="phoneNumber" type="phone" no-label-float value="{{formData.phoneNumber}}" on-focusout="allFieldsInput"></paper-input>
+
+          <div class="wrapper-btns">
+              <paper-button id="sendSMSButton" raised class="link"
+              on-tap="sendSMSCode">Send SMS Verification</paper-button>
+          </div>
+
 
           <google-recaptcha style="margin-top: 15px"
             force-in-body
@@ -91,6 +98,7 @@
   
   <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
   <iron-ajax id="ajaxRecaptcha" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
+  <iron-ajax id="ajaxSMS" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
 
   </template>
 
@@ -115,7 +123,8 @@
               'email': '',
               'password': '',
               'repeatpassword': '',
-              'g-recaptcha-response': 'asdfasd',
+              'phoneNumber': '',
+              'g-recaptcha-response': '',
             },
           },
           conditionalCSS: {
@@ -152,20 +161,20 @@
 
       allFieldsInput(){
 
-        // var blanks = false;
-        // Object.keys(this.formData).map(key => {
-        //   if(this.formData[key] === ''){
-        //     blanks = true
-        //     return
-        //   }
-        // })
+        var blanks = false;
+        Object.keys(this.formData).map(key => {
+          if(this.formData[key] === ''){
+            blanks = true
+            return
+          }
+        })
 
-        // blanks ? 
-        //   this.set('conditionalCSS.blankswarning', 'block') : 
-        //   this.set('conditionalCSS.blankswarning', 'none')
+        blanks ? 
+          this.set('conditionalCSS.blankswarning', 'block') : 
+          this.set('conditionalCSS.blankswarning', 'none')
 
-        // blanks ? 
-        //    this.set('validForm.allfields', false) : 
+        blanks ? 
+           this.set('validForm.allfields', false) : 
            this.set('validForm.allfields', true)
       }
 
@@ -227,6 +236,13 @@
         this.$.ajaxRecaptcha.body = JSON.stringify(this.formData);
         this.$.ajaxRecaptcha.generateRequest();
       }
+
+      sendSMSCode(){
+        this.$.ajaxSMS.url = "/sendsms"
+        this.$.ajaxSMS.body = JSON.stringify(this.formData);
+        this.$.ajaxSMS.generateRequest();
+      }
+
 
 
       ready(){
